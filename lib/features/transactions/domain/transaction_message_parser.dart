@@ -27,35 +27,52 @@ class TransactionMessageParser {
   late String _workingMessage;
   final List<String> _sentenceStructure = [];
 
-  List<(_TokenType, Parser<String>)> _getParsers() {
-    // TODO: Add more date formats
-    final date = (digit().times(2) & char('.') & digit().times(2) & char('.') & digit().times(4))
-        .flatten()
-        .trim();
+  Parser<String> _getDateParser() {
+    Parser<int> constrainedInt(int max, String label) {
+      return digit().repeat(1, 2).flatten().map(int.parse).where(
+            (value) => value >= 1 && value <= max
+      );
+    }
 
+    final day = constrainedInt(31, 'Day');
+    final month = constrainedInt(12, 'Month');
+    final separator = char('.');
+    final year = (separator & (digit().repeat(4) | digit().repeat(2)).flatten()).optional();
+    final trailingDot = char('.').optional();
+    return (day & separator & month & year & trailingDot).flatten().trim();
+  }
+
+  Parser<String> _getAmountParser() {
     final thousandsAm = char(',') & digit().times(3);
     final decimalsAm = char('.') & digit().times(2) & digit().not();
     final thousandsEu = char('.') & digit().times(3);
     final decimalsEu = char(',') & digit().times(2) & digit().not();
     final euTail = (thousandsEu.star() & decimalsEu);
     final amTail = (thousandsAm.star() & decimalsAm);
-    final amount = (
+
+    return (
         digit().plus() &
         (euTail | amTail)
     ).flatten().trim();
+  }
 
-    // TODO: Add more currencies
-    final currency = (string('RSD', ignoreCase: true) | string('EUR', ignoreCase: true)).flatten().trim();
-
-    final card = (digit().plus() & char('*').plus() & digit().plus()).flatten().trim();
-
+  (Parser<String>, Parser<String>) _getVendorParser() {
     final specialChars = char('&') | char('?');
     final uppercaseWord = (uppercase() | specialChars).plus() & word().not();
     final titlecaseWord = uppercase() & (lowercase() | specialChars).star();
     final vendorWord = (uppercaseWord | titlecaseWord | digit().plus()).flatten();
     // TODO: Add more filler characters
     final separator = char(' ');
-    final vendor = (vendorWord & (separator & vendorWord).plus()).flatten().trim();
+    return ((vendorWord & (separator & vendorWord).plus()).flatten().trim(), vendorWord.flatten());
+  }
+
+  List<(_TokenType, Parser<String>)> _getParsers() {
+    final date = _getDateParser();
+    final amount = _getAmountParser();
+    // TODO: Add more currencies
+    final currency = (string('RSD', ignoreCase: true) | string('EUR', ignoreCase: true)).flatten().trim();
+    final card = (digit().plus() & char('*').plus() & digit().plus()).flatten().trim();
+    final (vendor, possibleVendor) = _getVendorParser();
 
     return [
       (_TokenType.card, card),
@@ -63,7 +80,7 @@ class TransactionMessageParser {
       (_TokenType.amount, amount),
       (_TokenType.currency, currency),
       (_TokenType.vendor, vendor),
-      (_TokenType.possibleVendor, vendorWord.flatten()),
+      (_TokenType.possibleVendor, possibleVendor),
     ];
   }
 
@@ -153,5 +170,9 @@ class TransactionMessageParser {
 
     _extractMoneyTokens();
     _extractSentenceStructure();
+    for(final token in _allTokens) {
+      print("${token.value} - ${token.type}");
+    }
+    print(_generateStableHash(_sentenceStructure));
   }
 }
