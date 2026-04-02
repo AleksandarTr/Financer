@@ -20,9 +20,12 @@ class _ParsedToken {
 
 class TransactionMessageParser {
   final List<_ParsedToken> _allTokens = [];
-  final Map<_TokenType, List<_ParsedToken>> _tokensByType = {};
+  final Map<_TokenType, List<_ParsedToken>> _tokensByType = {
+    for (var type in _TokenType.values) type: []
+  };
   final String _message;
   late String _workingMessage;
+  final List<String> _sentenceStructure = [];
 
   List<(_TokenType, Parser<String>)> _getParsers() {
     // TODO: Add more date formats
@@ -49,10 +52,10 @@ class TransactionMessageParser {
     final specialChars = char('&') | char('?');
     final uppercaseWord = (uppercase() | specialChars).plus() & word().not();
     final titlecaseWord = uppercase() & (lowercase() | specialChars).star();
-    final vendorWord = (uppercaseWord | titlecaseWord).flatten();
+    final vendorWord = (uppercaseWord | titlecaseWord | digit().plus()).flatten();
     // TODO: Add more filler characters
     final separator = char(' ');
-    final vendor = (vendorWord & (separator & (vendorWord | digit().plus())).plus()).flatten().trim();
+    final vendor = (vendorWord & (separator & vendorWord).plus()).flatten().trim();
 
     return [
       (_TokenType.card, card),
@@ -86,6 +89,58 @@ class TransactionMessageParser {
     }
   }
 
+  void _extractMoneyTokens() {
+    for (int i = 0; i < _allTokens.length - 1; i++) {
+      final current = _allTokens[i];
+      final next = _allTokens[i + 1];
+
+      final isAmountCurrency = current.type == _TokenType.amount && next.type == _TokenType.currency;
+      final isCurrencyAmount = current.type == _TokenType.currency && next.type == _TokenType.amount;
+
+      if (isAmountCurrency || isCurrencyAmount) {
+        final amount = isAmountCurrency ? current.value : next.value;
+        final currency = isAmountCurrency ? next.value : current.value;
+
+        _tokensByType[_TokenType.money]?.add(_ParsedToken(
+          current.start,
+          next.end,
+          _Money(amount, currency),
+          _TokenType.money,
+        ));
+      }
+    }
+  }
+
+  void _extractSentenceStructure() {
+    bool hasVendor = _tokensByType[_TokenType.vendor]?.isNotEmpty ?? false;
+    for (_ParsedToken token in _allTokens) {
+      switch(token.type) {
+        case _TokenType.other:
+          _sentenceStructure.add(token.value);
+          break;
+        case _TokenType.possibleVendor:
+          if(hasVendor) _sentenceStructure.add(token.value);
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  int _generateStableHash(List<String> structure) {
+    final String raw = structure.join('|');
+
+    int hash = 0xcbf29ce484222325;
+    const int prime = 0x100000001b3;
+
+    for (int i = 0; i < raw.length; i++) {
+      hash ^= raw.codeUnitAt(i);
+      hash = (hash * prime) & 0xFFFFFFFFFFFFFFFF;
+    }
+
+    return hash;
+  }
+
   TransactionMessageParser(this._message) {
     _workingMessage = _message;
     List<(_TokenType, Parser<String>)> parsers = _getParsers();
@@ -96,20 +151,7 @@ class TransactionMessageParser {
     _extractRemainder();
     _allTokens.sort((t1, t2) => t1.start.compareTo(t2.start));
 
-    for (int i = 0; i < _allTokens.length; i++) {
-      _ParsedToken token = _allTokens[i];
-      if (token.type == _TokenType.amount
-          && i + 1 < _allTokens.length && _allTokens[i + 1].type == _TokenType.currency) {
-        _tokensByType[_TokenType.money]?.add(
-            _ParsedToken(
-                token.start,
-                _allTokens[i + 1].end,
-                _Money(token.value, _allTokens[i + 1].value),
-                _TokenType.money)
-        );
-      }
-
-      print("${token.value} - ${token.type}");
-    }
+    _extractMoneyTokens();
+    _extractSentenceStructure();
   }
 }
