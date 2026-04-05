@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:financer/features/currencies/data/default_values.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
@@ -21,6 +22,25 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (m) async {
+        // 1. Create all tables first
+        await m.createAll();
+
+        // 2. Insert default currencies
+        await batch((batch) {
+          batch.insertAll(currencies, defaultCurrencies);
+        });
+      },
+      beforeOpen: (details) async {
+        // Ensure foreign keys are on every time the app starts
+        await customStatement('PRAGMA foreign_keys = ON');
+      },
+    );
+  }
 }
 
 LazyDatabase _openConnection() {
