@@ -30,6 +30,22 @@ class _InfiniteListViewState<T> extends State<InfiniteListView<T>> {
     _scrollController.addListener(_onScroll);
   }
 
+  @override
+  void didUpdateWidget(InfiniteListView<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Refresh the list if the widget configuration changes
+    _refresh();
+  }
+
+  void _refresh() {
+    _items.clear();
+    _currentOffset = 0;
+    _hasMore = true;
+    _isLoading = false;
+    _scrollController.jumpTo(0);
+    _loadMore();
+  }
+
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {

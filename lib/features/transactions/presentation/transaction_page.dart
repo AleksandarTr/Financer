@@ -39,13 +39,11 @@ class _TransactionPageState extends State<TransactionPage> {
   Widget _buildNewTransactionButton() {
     return FloatingActionButton(
       child: const Icon(Icons.add),
-      onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const NewTransactionPage()
-            )
+      onPressed: () async {
+        await Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const NewTransactionPage()),
         );
+        setState(() {});
       }
     );
   }
