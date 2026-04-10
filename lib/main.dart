@@ -1,9 +1,5 @@
-import 'package:drift/drift.dart' hide Column;
 import 'package:financer/features/transactions/presentation/transaction_page.dart';
 import 'package:flutter/material.dart';
-
-import 'core/database/database.dart';
-import 'features/transactions/domain/transaction_message_parser.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,30 +8,51 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    const title = 'Financer';
+    final navigatorKey = GlobalKey<NavigatorState>();
+
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: title,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const HomePage(title: 'Financer'),
+      home: Scaffold(
+          appBar: AppBar(
+            title: Text(title),
+            leading: Builder(
+              builder: (BuildContext context) {
+                return IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    if (navigatorKey.currentState!.canPop()) {
+                      navigatorKey.currentState?.pop(context);
+                    }
+                  },
+                );
+              },
+            ),
+          ),
+          body: PopScope(
+              canPop: false,
+              onPopInvokedWithResult: (didPop, result) async {
+                if (didPop) return;
+                final canGoBack = navigatorKey.currentState?.canPop() ?? false;
+                if (canGoBack) {
+                  navigatorKey.currentState?.pop();
+                }
+              },
+              child: Navigator(
+                key: navigatorKey,
+                onGenerateRoute: (RouteSettings settings) {
+                  return MaterialPageRoute(
+                    builder: (context) => const HomePage(title: title),
+                  );
+                },
+              )
+          )
+      ),
     );
   }
 }
@@ -52,8 +69,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentPageIndex = 0;
 
-  static const IconData attachMoneySharp = IconData(0xe7b0, fontFamily: 'MaterialIcons');
-  static const IconData accountBalanceSharp = IconData(0xe740, fontFamily: 'MaterialIcons');
+  static const IconData attachMoneySharp = IconData(
+      0xe7b0, fontFamily: 'MaterialIcons');
+  static const IconData accountBalanceSharp = IconData(
+      0xe740, fontFamily: 'MaterialIcons');
 
   @override
   Widget build(BuildContext context) {

@@ -1,9 +1,9 @@
 import 'package:drift/drift.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:financer/features/transactions/presentation/new_transaction_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/database/database.dart';
-import '../../../core/util/FixedPointHelper.dart';
+import '../../../core/widgets/infinite_list_view.dart';
 
 class TransactionPage extends StatefulWidget {
   const TransactionPage({super.key, required this.title});
@@ -14,34 +14,44 @@ class TransactionPage extends StatefulWidget {
 }
 
 class _TransactionPageState extends State<TransactionPage> {
-  Stream<List<Transaction>> getTransactions() {
-    return AppDatabase.instance.transactions.all().watch();
+  Future<List<Transaction>> getTransactionsPaged(int limit, int offset) {
+    return (AppDatabase.instance.transactions.select()
+      ..orderBy(
+          [(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)])
+      ..limit(limit, offset: offset))
+        .get();
+  }
+
+  Widget _buildTransactionList() {
+    return Scaffold(
+      body: InfiniteListView<Transaction>(
+        pageSize: 20,
+        loader: getTransactionsPaged,
+        itemBuilder: (context, transaction) => ListTile(
+          title: Text(transaction.name),
+          trailing: Text("${transaction.baseAmount / 100} RSD"),
+        ),
+      ),
+      floatingActionButton: _buildNewTransactionButton(),
+    );
+  }
+
+  Widget _buildNewTransactionButton() {
+    return FloatingActionButton(
+      child: const Icon(Icons.add),
+      onPressed: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const NewTransactionPage()
+            )
+        );
+      }
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-        stream: getTransactions(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No transactions found.'));
-          } else {
-            final transactions = snapshot.data!;
-            return ListView.builder(
-              itemCount: transactions.length,
-              itemBuilder: (context, index) {
-                final transaction = transactions[index];
-                return ListTile(
-                  title: Text(transaction.name),
-                  subtitle: Text('Amount: ${priceToString(transaction.baseAmount)}'),
-                );
-              },
-            );
-          }
-        });
+    return _buildTransactionList();
   }
 }
