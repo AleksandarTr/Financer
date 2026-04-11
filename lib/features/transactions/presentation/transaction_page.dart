@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:financer/features/transactions/presentation/new_transaction_page.dart';
+import 'package:financer/features/transactions/presentation/transaction_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/database/database.dart';
@@ -14,12 +15,9 @@ class TransactionPage extends StatefulWidget {
 }
 
 class _TransactionPageState extends State<TransactionPage> {
-  Future<List<Transaction>> getTransactionsPaged(int limit, int offset) {
-    return (AppDatabase.instance.transactions.select()
-      ..orderBy(
-          [(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)])
-      ..limit(limit, offset: offset))
-        .get();
+  SimpleSelectStatement getTransactionsPaged() {
+    return AppDatabase.instance.transactions.select()
+      ..orderBy([(t) => OrderingTerm(expression: t.date, mode: OrderingMode.desc)]);
   }
 
   Widget _buildTransactionList() {
@@ -27,10 +25,7 @@ class _TransactionPageState extends State<TransactionPage> {
       body: InfiniteListView<Transaction>(
         pageSize: 20,
         loader: getTransactionsPaged,
-        itemBuilder: (context, transaction) => ListTile(
-          title: Text(transaction.name),
-          trailing: Text("${transaction.baseAmount / 100} RSD"),
-        ),
+        itemBuilder: (context, transaction) => TransactionWidget(transaction: transaction),
       ),
       floatingActionButton: _buildNewTransactionButton(),
     );
@@ -50,6 +45,11 @@ class _TransactionPageState extends State<TransactionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildTransactionList();
+    return Container(
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: Theme.of(context).dividerColor, width: 2))
+        ),
+        child: _buildTransactionList()
+    );
   }
 }

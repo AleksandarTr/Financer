@@ -18,6 +18,14 @@ enum TransactionType {
       case TransactionType.transfer: return Colors.blue;
     }
   }
+
+  Icon get icon {
+    switch (this) {
+      case TransactionType.income: return const Icon(Icons.arrow_upward, color: Colors.green);
+      case TransactionType.expense: return const Icon(Icons.arrow_downward, color: Colors.red);
+      case TransactionType.transfer: return const Icon(Icons.swap_horiz, color: Colors.blue);
+    }
+  }
 }
 
 class Transactions extends Table {

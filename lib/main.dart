@@ -1,23 +1,53 @@
+import 'dart:io';
+
 import 'package:financer/features/transactions/presentation/transaction_page.dart';
 import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+  const title = "Financer";
+
+  WindowOptions windowOptions = const WindowOptions(
+    minimumSize: Size(800, 600), // Prevent resizing below this
+    center: true,
+    title: title,
+  );
+
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+    await windowManager.setPreventClose(true);
+  });
+
+  windowManager.addListener(GlobalWindowListener());
+
+  runApp(const MyApp(title: title,));
+}
+
+class GlobalWindowListener extends WindowListener {
+  @override
+  void onWindowClose() async {
+    exit(0);
+  }
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String title;
+
+  const MyApp({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
-    const title = 'Financer';
     final navigatorKey = GlobalKey<NavigatorState>();
+    final ThemeData theme = ThemeData(
+      colorScheme: .fromSeed(seedColor: Colors.cyan),
+    );
 
     return MaterialApp(
       title: title,
-      theme: ThemeData(
-        colorScheme: .fromSeed(seedColor: Colors.cyan),
-      ),
+      theme: theme,
       home: Scaffold(
           appBar: AppBar(
             title: Text(title),
@@ -47,7 +77,7 @@ class MyApp extends StatelessWidget {
                 key: navigatorKey,
                 onGenerateRoute: (RouteSettings settings) {
                   return MaterialPageRoute(
-                    builder: (context) => const HomePage(title: title),
+                    builder: (context) => HomePage(title: title),
                   );
                 },
               )

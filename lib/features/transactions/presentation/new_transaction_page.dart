@@ -99,7 +99,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     ];
   }
 
-  Widget _buildAccountDropdown(String label, Function (Account) onSelected) {
+  Widget _buildAccountDropdown(String label, Function (Future<Account?>) onSelected) {
     return FutureBuilder<List<Account>>(
       future: AccountManager().accounts,
       builder: (context, snapshot) {
@@ -113,14 +113,12 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
           );
         }
 
-        final accounts = snapshot.data!;
-
         return DropdownButtonFormField<int>(
           decoration: InputDecoration(
             labelText: label,
             prefixIcon: const Icon(Icons.account_balance_wallet),
           ),
-          items: accounts.map((account) {
+          items: snapshot.data!.map((account) {
             return DropdownMenuItem<int>(
               value: account.id,
               child: Text(account.name),
@@ -128,7 +126,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
           }).toList(),
           onChanged: (value) {
             setState(() {
-              onSelected(accounts.firstWhere((acc) => acc.id == value));
+              onSelected(AccountManager()[value!]);
             });
           },
           validator: (value) => value == null ? 'Please select an account' : null,
@@ -233,11 +231,11 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
           ),
           if (_selectedType == TransactionType.income || _selectedType == TransactionType.transfer) ...[
             const SizedBox(height: 10),
-            _buildAccountDropdown("From account", (account) => _selectedFromAccount = account)
+            _buildAccountDropdown("From account", (account) async => _selectedFromAccount = (await account)!)
           ],
           if (_selectedType == TransactionType.expense || _selectedType == TransactionType.transfer) ...[
             const SizedBox(height: 10),
-            _buildAccountDropdown("To account", (account) => _selectedToAccount = account)
+            _buildAccountDropdown("To account", (account) async => _selectedToAccount = (await account)!)
           ],
           const SizedBox(height: 10),
           _buildCategoryDropdown(),

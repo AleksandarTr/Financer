@@ -1,8 +1,9 @@
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 
 class InfiniteListView<T> extends StatefulWidget {
   final Widget Function(BuildContext, T) itemBuilder;
-  final Future<List<T>> Function(int limit, int offset) loader;
+  final SimpleSelectStatement Function() loader;
   final int pageSize;
 
   const InfiniteListView({
@@ -33,7 +34,6 @@ class _InfiniteListViewState<T> extends State<InfiniteListView<T>> {
   @override
   void didUpdateWidget(InfiniteListView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Refresh the list if the widget configuration changes
     _refresh();
   }
 
@@ -57,14 +57,15 @@ class _InfiniteListViewState<T> extends State<InfiniteListView<T>> {
 
   Future<void> _loadMore() async {
     setState(() => _isLoading = true);
-    final newItems = await widget.loader(widget.pageSize, _currentOffset);
+    final newItems = await (widget.loader()
+      ..limit(widget.pageSize, offset: _currentOffset)).get();
 
     setState(() {
       _isLoading = false;
       if (newItems.length < widget.pageSize) {
         _hasMore = false;
       }
-      _items.addAll(newItems);
+      _items.addAll(newItems as Iterable<T>);
       _currentOffset += newItems.length;
     });
   }
