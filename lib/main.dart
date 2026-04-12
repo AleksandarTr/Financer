@@ -41,13 +41,31 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navigatorKey = GlobalKey<NavigatorState>();
-    final ThemeData theme = ThemeData(
-      colorScheme: .fromSeed(seedColor: Colors.cyan),
+
+    final lightTheme = ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.cyan,
+        brightness: Brightness.light,
+      ),
+    );
+
+    final darkTheme = ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.cyan,
+        brightness: Brightness.dark,
+      ),
+      scaffoldBackgroundColor: Colors.black,
     );
 
     return MaterialApp(
       title: title,
-      theme: theme,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: ThemeMode.system,
       home: Scaffold(
           appBar: AppBar(
             title: Text(title),

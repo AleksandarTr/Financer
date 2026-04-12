@@ -75,6 +75,8 @@ class _InfiniteListViewState<T> extends State<InfiniteListView<T>> {
     return ListView.builder(
       controller: _scrollController,
       itemCount: _items.length + (_hasMore ? 1 : 0),
+      addRepaintBoundaries: true,
+      addSemanticIndexes: false,
       itemBuilder: (context, index) {
         if(_items.length <= index) {
           return const Padding(
