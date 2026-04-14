@@ -35,7 +35,9 @@ class Transactions extends Table {
   TextColumn get name => text()();
   DateTimeColumn get date => dateTime()();
   IntColumn get type => intEnum<TransactionType>()();
+  @ReferenceName('outgoingTransactions')
   IntColumn get fromAccount => integer().nullable().references(Accounts, #id)();
+  @ReferenceName('incomingTransactions')
   IntColumn get toAccount => integer().nullable().references(Accounts, #id)();
   IntColumn get category => integer().references(Categories, #id)();
 }

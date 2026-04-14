@@ -13,5 +13,5 @@ class Accounts extends Table {
   IntColumn get startingBalance => integer()();
   IntColumn get currentBalance => integer()();
   IntColumn get type => intEnum<AccountType>()();
-  IntColumn get currency => integer().references(Currencies, #id)();
+  TextColumn get currency => text().references(Currencies, #code)();
 }

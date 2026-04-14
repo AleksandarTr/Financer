@@ -34,32 +34,23 @@ class TransactionWidget extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "${priceToString(transaction.baseAmount)} RSD",
+                  "${FixedPointHelper.priceToString(transaction.baseAmount)} RSD",
                   style: const TextStyle(fontSize: 18),
                 ),
                 if (transaction.convertedAmount !=
                     transaction.baseAmount) ...[
                   const SizedBox(width: 8),
                   Text(
-                    "(${priceToString(
+                    "(${FixedPointHelper.priceToString(
                         transaction.convertedAmount)} RSD)",
                     style: const TextStyle(fontSize: 14),
                   )
                 ]
               ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 4,
-            ),
-            child: Text(
-              transaction.date.toString().split(' ')[0],
             ),
           )
         ],

@@ -1,9 +1,10 @@
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide Column;
 import 'package:financer/features/transactions/presentation/new_transaction_page.dart';
 import 'package:financer/features/transactions/presentation/transaction_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/database/database.dart';
+import '../../../core/util/date_helper.dart';
 import '../../../core/widgets/infinite_list_view.dart';
 
 class TransactionPage extends StatefulWidget {
@@ -21,11 +22,31 @@ class _TransactionPageState extends State<TransactionPage> {
   }
 
   Widget _buildTransactionList() {
+    DateTime date = DateTime(1950);
     return Scaffold(
       body: InfiniteListView<Transaction>(
         pageSize: 20,
         loader: getTransactionsPaged,
-        itemBuilder: (context, transaction) => TransactionWidget(transaction: transaction),
+        itemBuilder: (context, transaction) {
+          final transactionWidget = TransactionWidget(transaction: transaction);
+          if (!isSameDay(transaction.date, date)) {
+            date = transaction.date;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Text(
+                    "${date.day}.${date.month}.${date.year}.",
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                transactionWidget
+              ],
+            );
+          }
+          return transactionWidget;
+        },
       ),
       floatingActionButton: _buildNewTransactionButton(),
     );

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:financer/features/currencies/data/frankfurter_api.dart';
 import 'package:financer/features/transactions/presentation/transaction_page.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navigatorKey = GlobalKey<NavigatorState>();
+    FrankfurterApi().fetchExchangeRates(DateTime.now(), "EUR");
 
     final lightTheme = ThemeData(
       useMaterial3: true,
