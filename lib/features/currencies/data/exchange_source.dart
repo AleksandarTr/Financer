@@ -1,3 +1,5 @@
+import '../../../core/database/database.dart';
+
 abstract interface class ExchangeSource {
-  void fetchExchangeRates(DateTime date, String currency);
+  Future<List<ConversionRate>> fetchExchangeRates(DateTime date, String currency);
 }

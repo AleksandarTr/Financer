@@ -1,0 +1,17 @@
+{
+  "appTitle": "Financer",
+  "addTransaction": "Add Transaction",
+  "transactions": "Transactions",
+  "accounts": "Accounts",
+  "name": "Name",
+  "amount": "Amount",
+  "date": "Date",
+  "category": "Category",
+  "type": "Type",
+  "income": "Income",
+  "expense": "Expense",
+  "transfer": "Transfer",
+  "fromAccount": "From Account",
+  "toAccount": "To Account",
+  "pleaseSelectType": "Please select a type"
+}

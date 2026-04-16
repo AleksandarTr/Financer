@@ -1,13 +1,9 @@
 import 'dart:convert';
-import 'dart:ffi';
 
-import 'package:drift/drift.dart';
 import 'package:financer/core/database/database.dart';
 import 'package:financer/core/util/fixed_point_helper.dart';
 import 'package:financer/features/currencies/data/exchange_source.dart';
 import 'package:http/http.dart' as http;
-
-import 'dart:convert';
 
 class _ExchangeRate {
   final DateTime date;

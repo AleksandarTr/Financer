@@ -2,6 +2,8 @@ import 'package:drift/drift.dart';
 import 'package:financer/core/database/database.dart';
 import 'package:financer/core/database/database_shorthand.dart';
 
+import 'account.dart';
+
 class AccountHelper {
   static Future<Currency> getCurrency(Account account) async {
     return (AppDatabase.instance.currencies.select()

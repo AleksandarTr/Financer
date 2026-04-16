@@ -5,6 +5,8 @@ import 'package:financer/features/accounts/domain/account_helper.dart';
 import '../../../core/database/database.dart';
 import '../../../core/database/database_shorthand.dart';
 import '../../../core/util/date_helper.dart';
+import '../../accounts/domain/account.dart';
+import '../../transactions/domain/transaction.dart';
 
 abstract class ExchangeEntity {
   Future<String> getCurrency();

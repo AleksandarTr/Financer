@@ -4,6 +4,7 @@ import 'package:financer/features/currencies/data/frankfurter_api.dart';
 import 'package:financer/features/transactions/presentation/transaction_page.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:financer/generated/l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,6 +69,8 @@ class MyApp extends StatelessWidget {
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: ThemeMode.system,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
           appBar: AppBar(
             title: Text(title),
@@ -127,6 +130,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
@@ -136,14 +141,14 @@ class _HomePageState extends State<HomePage> {
         },
         indicatorColor: Colors.amber,
         selectedIndex: _currentPageIndex,
-        destinations: const <Widget>[
+        destinations: <Widget>[
           NavigationDestination(
             icon: Icon(attachMoneySharp),
-            label: 'Transactions',
+            label: l10n.transactions,
           ),
           NavigationDestination(
             icon: Icon(accountBalanceSharp),
-            label: 'Accounts',
+            label: l10n.accounts,
           )
         ],
       ),

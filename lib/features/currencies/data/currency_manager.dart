@@ -1,34 +1,32 @@
 import 'package:drift/drift.dart';
+import 'package:financer/core/database/database.dart';
+import 'package:financer/core/database/table_manager.dart';
 
-import '../../../core/database/database.dart';
-import '../../../core/database/table_manager.dart';
-import '../domain/account.dart';
+class CurrencyManager extends TableManager<Currency, String> {
+  CurrencyManager._internal();
+  static final CurrencyManager _instance = CurrencyManager._internal();
+  factory CurrencyManager() => _instance;
 
-class AccountManager extends TableManager<Account, int> {
-  AccountManager._internal();
-  static final AccountManager _instance = AccountManager._internal();
-  factory AccountManager() => _instance;
-
-  Map<int, Account>? _accountMap;
+  Map<String, Currency>? _currencyMap;
 
   // We store the loading operation itself
   Future<void>? _loadingFuture;
 
   @override
-  Future<Map<int, Account>> get map async {
+  Future<Map<String, Currency>> get map async {
     await _loadMap();
-    return _accountMap!;
+    return _currencyMap!;
   }
 
   @override
-  Future<List<Account>> get values async {
+  Future<List<Currency>> get values async {
     await _loadMap();
-    return _accountMap!.values.toList();
+    return _currencyMap!.values.toList();
   }
 
   Future<void> _loadMap() async {
     // 1. If data is already here, do nothing
-    if (_accountMap != null) return;
+    if (_currencyMap != null) return;
 
     // 2. If a load is already in progress, just wait for it
     if (_loadingFuture != null) {
@@ -42,8 +40,8 @@ class AccountManager extends TableManager<Account, int> {
 
   Future<void> _performLoad() async {
     try {
-      final accounts = await AppDatabase.instance.accounts.all().get();
-      _accountMap = {for (var a in accounts) a.id: a};
+      final currencies = await AppDatabase.instance.currencies.all().get();
+      _currencyMap = {for (var a in currencies) a.code: a};
     } finally {
       // Clear the future tracker so we can load again if cache is cleared
       _loadingFuture = null;
@@ -51,14 +49,14 @@ class AccountManager extends TableManager<Account, int> {
   }
 
   @override
-  Future<Account?> operator[] (int id) async {
+  Future<Currency?> operator[] (String code) async {
     await _loadMap();
-    return _accountMap?[id];
+    return _currencyMap?[code];
   }
 
   @override
   void clearCache() {
-    _accountMap = null;
+    _currencyMap = null;
     _loadingFuture = null;
   }
 }

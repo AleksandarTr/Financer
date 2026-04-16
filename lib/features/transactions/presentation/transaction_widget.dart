@@ -3,7 +3,7 @@ import 'package:financer/core/widgets/hoverable_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../../core/database/database.dart';
+import '../domain/transaction.dart';
 
 class TransactionWidget extends StatelessWidget {
   final Transaction transaction;

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../core/database/database.dart';
 import '../../../core/util/date_helper.dart';
 import '../../../core/widgets/infinite_list_view.dart';
+import '../domain/transaction.dart';
 
 class TransactionPage extends StatefulWidget {
   const TransactionPage({super.key, required this.title});
