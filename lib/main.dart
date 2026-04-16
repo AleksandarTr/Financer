@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:financer/features/accounts/presentation/account_page.dart';
 import 'package:financer/features/currencies/data/frankfurter_api.dart';
 import 'package:financer/features/transactions/presentation/transaction_page.dart';
 import 'package:flutter/material.dart';
@@ -154,7 +155,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: <Widget>[
         TransactionPage(title: widget.title),
-        Container(color: theme.colorScheme.primaryContainer)
+        AccountPage()
       ][_currentPageIndex],
     );
   }

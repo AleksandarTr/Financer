@@ -13,5 +13,7 @@
   "transfer": "Transfer",
   "fromAccount": "From Account",
   "toAccount": "To Account",
-  "pleaseSelectType": "Please select a type"
+  "pleaseSelectType": "Please select a type",
+  "cash": "Cash",
+  "checkingAccount": "Checking account"
 }

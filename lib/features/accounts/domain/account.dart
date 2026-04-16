@@ -1,11 +1,28 @@
+
 import 'package:drift/drift.dart';
 import 'package:financer/core/util/has_id.dart';
+import 'package:flutter/material.dart' hide Table;
 
+import '../../../generated/l10n/app_localizations.dart';
 import '../../currencies/domain/currency.dart';
 
 enum AccountType {
   cash,
-  checkingAccount
+  checkingAccount;
+
+  String getLabel(AppLocalizations l10n) {
+    switch (this) {
+      case cash: return l10n.cash;
+      case checkingAccount: return l10n.checkingAccount;
+    }
+  }
+  
+  Icon get icon {
+    switch(this) {
+      case cash: return const Icon(Icons.wallet, color: Colors.orange);
+      case checkingAccount: return const Icon(Icons.account_balance, color: Colors.blue);
+    }
+  }
 }
 
 @UseRowClass(Account)
