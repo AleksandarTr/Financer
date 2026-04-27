@@ -1,6 +1,6 @@
 {
   "appTitle": "Financer",
-  "addTransaction": "Add Transaction",
+  "addTransaction": "Add transaction",
   "transactions": "Transactions",
   "accounts": "Accounts",
   "name": "Name",
@@ -15,5 +15,8 @@
   "toAccount": "To Account",
   "pleaseSelectType": "Please select a type",
   "cash": "Cash",
-  "checkingAccount": "Checking account"
+  "checkingAccount": "Checking account",
+  "startingBalance": "Starting balance",
+  "addAccount": "Add account",
+  "currency": "Currency"
 }

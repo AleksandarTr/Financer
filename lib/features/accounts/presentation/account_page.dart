@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart' hide Column;
 import 'package:financer/core/database/database_shorthand.dart';
+import 'package:financer/features/accounts/presentation/new_account_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/widgets/infinite_list_view.dart';
@@ -57,9 +58,9 @@ class _AccountPageState extends State<AccountPage> {
     return FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () async {
-          // await Navigator.of(context).push(
-          //   MaterialPageRoute(builder: (context) => const NewTransactionPage()),
-          // );
+          await Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => const NewAccountPage()),
+          );
           setState(() {});
         }
     );

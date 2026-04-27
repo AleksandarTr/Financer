@@ -6,7 +6,7 @@ import 'package:flutter/material.dart' hide Table;
 import '../../../generated/l10n/app_localizations.dart';
 import '../../currencies/domain/currency.dart';
 
-enum AccountType {
+enum AccountType implements HasID<int> {
   cash,
   checkingAccount;
 
@@ -23,6 +23,9 @@ enum AccountType {
       case checkingAccount: return const Icon(Icons.account_balance, color: Colors.blue);
     }
   }
+
+  @override
+  int get id => index;
 }
 
 @UseRowClass(Account)
@@ -37,19 +40,19 @@ class Accounts extends Table {
 
 class Account implements HasID<int> {
   @override
-  final int id;
-  final String name;
-  final int startingBalance;
-  final int currentBalance;
-  final AccountType type;
-  final String currency;
+  int id;
+  String name;
+  int startingBalance;
+  int currentBalance;
+  AccountType type;
+  String currency;
 
   Account({
-    required this.id,
-    required this.name,
-    required this.startingBalance,
-    required this.currentBalance,
-    required this.type,
-    required this.currency,
+    this.id = 0,
+    this.name = "",
+    this.startingBalance = 0,
+    this.currentBalance = 0,
+    this.type = AccountType.cash,
+    this.currency = "EUR",
   });
 }
